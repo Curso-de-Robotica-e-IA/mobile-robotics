@@ -1,0 +1,32 @@
+# Rosbags e dados brutos (muito grandes para Git)
+data/raw/
+*.bag
+*.db3
+*.mcap
+
+# Dados processados
+data/processed/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+*.egg-info/
+
+# ROS 2 build
+build/
+install/
+log/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Resultados intermediários (manter só os finais)
+results/plots/*.png
+results/plots/*.svg
