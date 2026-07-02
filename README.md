@@ -1,51 +1,45 @@
-# Mobile Robotics Navigation Experiments
+# Mobile Robotics Navigation Experiments (CBSoft Edition)
 
-Repositório de experimentos de navegação autônoma com TurtleBot 4 + ROS 2/Nav2, com coleta simultânea de métricas de conectividade wireless (BLE, Wi-Fi) em ambientes indoor controlados. Projeto desenvolvido no Centro de Informática (CIn/UFPE) como parte da linha de pesquisa em robótica móvel e sistemas cyber-físicos.
-
----
+Repositório de experimentos de navegação autônoma com **TurtleBot 4 + ROS 2/Nav2**, com coleta simultânea de métricas de conectividade wireless (Bluetooth/BLE) em ambientes indoor controlados. Projeto desenvolvido no CRIAR - Centro de Informática (CIn/UFPE) como parte da linha de pesquisa em robótica móvel e sistemas cyber-físicos.
 
 ## Visão Geral
 
-O projeto investiga a reprodutibilidade de trajetórias em navegação autônoma e seu impacto na qualidade de coleta de dados wireless. Utilizamos o TurtleBot 4 como plataforma experimental em um corredor indoor mapeado (hall_cin_v4), avaliando diferentes controladores locais do Nav2 (DWB e RPP) sob métricas de consistência de trajetória e estabilidade de sinal BLE.
+O escopo deste projeto apresenta uma infraestrutura baseada em robótica móvel para testar a qualidade do sinal Bluetooth Low Energy (BLE) sob condições controladas e reprodutíveis. Utilizamos o TurtleBot 4 como plataforma experimental em um corredor indoor mapeado (`hall_cin_v4`) para avaliar a degradação do sinal (RSSI) e os limites de desconexão em função da distância. A avaliação comparou dois tipos de conexão entre dois dispositivos: uma configuração **homogênea** (Motorola <-> Motorola) e outra **heterogênea** (Motorola <-> POCO). Para cada tipo, foram realizadas 3 rodadas, com um dispositivo fixo e outro móvel em cima do robô ao longo da mesma trajetória até a perda total da conexão.
 
----
+### Hipótese de Pesquisa
+- Essa abordagem mitiga a variabilidade e a atenuação causada pela interferência humana (*body shadowing*) inerente aos testes manuais?
 
 ## Plataforma
 
-| Componente        | Especificação                        |
-|-------------------|--------------------------------------|
-| Robô              | TurtleBot 4 (differential drive)     |
-| Sistema           | ROS 2 Humble                         |
-| Navegação         | Nav2 (AMCL + DWB / RPP)             |
-| Mapa              | hall_cin_v4 (CIn/UFPE)              |
-| Arquitetura       | PC Host + Raspberry Pi               |
-| Coleta wireless   | BLE via bleak (Python)               |
-
----
+| Componente        | Especificação           |
+|-------------------|-------------------------|
+| Robô              | TurtleBot 4             |
+| Sistema           | ROS 2 Humble            |
+| Navegação         | Nav2                    |
+| Mapa              | hall_cin_v4 (CIn/UFPE)  |
+| Arquitetura       | PC Host + Raspberry Pi  |
+| Coleta wireless   | nRF Connect + ADB       |
 
 ## Cenários Planejados
 
-| # | Cenário                     | Foco                        | Status          |
-|---|-----------------------------|-----------------------------|-----------------|
-| 1 | Path Following              | Reprodutibilidade           | Em andamento    |
-| 2 | Waypoint Density Study      | Planejamento de rota        | Planejado       |
-| 3 | DWB vs RPP                  | Comparação de controllers   | Planejado       |
-| 4 | Velocity Profile Study      | Perfil de movimento         | Planejado       |
-| 5 | Dynamic Obstacles           | Robustez                    | Planejado       |
-| 6 | RSSI-Driven Coverage Mapping| Mapeamento BLE autônomo     | Planejado       |
-
----
+| # | Cenário                       | Foco                                         | Status     |
+|---|-------------------------------|----------------------------------------------|------------|
+| 1 | Degradação BLE (Homogênea)    | Distância de desconexão e RSSI               | Concluído  |
+| 2 | Degradação BLE (Heterogênea)  | Distância de desconexão e RSSI               | Concluído  |
+| 3 | Extensão para Wi-Fi           | Generalização para outras tecnologias        | Planejado  |
+| 4 | Oclusão por Obstáculos        | Comportamento sob diferentes interferências  | Planejado  |
+| 5 | Automação Completa do Setup   | Redução de intervenção manual                | Planejado  |
 
 ## Estrutura do Repositório
 
 ```text
 mobile-robotics/
-
 ├── docs/               # Documentação
 │   ├── setup.md        # Guia de instalação e configuração
+│   ├── troubleshoot.md # Guia de resolução de problemas 
 │   └── scenarios/      # Descrição formal de cada cenário
 ├── maps/               # Mapas do ambiente (.yaml + .pgm)
-├── config/             # Configurações Nav2, AMCL, controllers
+├── config/             # Configurações Nav2, AMCL
 ├── scripts/
 │   ├── collection/     # Coleta de dados (BLE, NAV2 logs)
 │   ├── analysis/       # Análise e geração de métricas/plots
@@ -53,41 +47,30 @@ mobile-robotics/
 ├── data/               # .gitignore
 │   ├── raw/            
 │   └── processed/      
-├── results/
+├── results/            # .gitignore
 │   ├── plots/          # Gráficos gerados
 │   └── reports/        # Relatórios de experimento
 ├── .gitignore
 └── README.md
 ```
 
----
-
 ## Início Rápido
+Para configurar o ambiente do zero, consulte o guia completo em [guia completo](docs/setup.md).
 
-Para configurar o ambiente do zero, siga o guia completo em [docs/setup.md](docs/setup.md).
+Para preparar e rodar um experimento físico, siga o fluxo de execução abaixo:
 
-Para rodar um experimento:
+1. Execute o build da imagem Docker (necessário apenas na primeira execução ou caso altere dependências).
+2. Ligue o Docker e estabeleça a conexão de rede com o TurtleBot 4.
+3. Em terminais separados dentro do container, inicialize a infraestrutura do ROS 2 executando: o servidor de mapa, a pilha de navegação e a interface visual (RViz).
+4. No RViz, utilize a ferramenta 2D Pose Estimate para definir a pose inicial exata do robô no mapa.
+5. Aguarde o carregamento completo da árvore de TF e dos Costmaps.
+6. Inicie simultaneamente o script de navegação (no terminal do Docker) e o script de coleta BLE. 
+    - ⚠️ Atenção: O script de coleta de sinal utiliza comandos ADB e deve ser executado obrigatoriamente no ambiente Windows (Host).
+7. Monitore a execução até a ocorrência da desconexão BLE. Neste momento, finalize manualmente ambos os scripts (Nav e ADB).
+8. Os logs de saída serão gerados e salvos automaticamente no diretório data/raw.
 
-```bash
-# 1. Defina a pose inicial do robô
-python3 scripts/utils/set_initial_pose.py
-
-# 2. Grave a trajetória de referência
-python3 scripts/collection/record_trajectory.py \
-    --output data/processed/reference_path.csv
-
-# 3. Execute o replay nas rodadas seguintes
-python3 scripts/collection/replay_trajectory.py \
-    --path data/processed/reference_path.csv --run 2
-```
-
----
-
-## Equipe
-
+## Equipe CRIAR - CIn/UFPE 
 - Fernanda Neves
-- Beatriz de Oliveira
-- Breno Miranda (orientador)
+- Beatriz Oliveira
 - Adrien Durand-Petiteville (orientador)
-
-CIn/UFPE — Grupo CRIAR
+- Breno Miranda (orientador)
