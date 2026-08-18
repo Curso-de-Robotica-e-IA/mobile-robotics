@@ -55,6 +55,9 @@ Para configurar o ambiente do zero, consulte o guia completo em [guia completo](
 
 Para preparar e rodar um experimento, consulte o roteiro passo a passo em [como rodar experimentos](docs/scenarios/how_to_run_experiments.md).
 
+## Dados e Resultados
+Os resultados dos experimentos, assim como as coletas e os arquivos de configuração, estão disponíveis no drive compartilhado do projeto: [Dados e Resultados](https://drive.google.com/drive/folders/1d0rhT32wqBUhjhXvopno0pvAuk-UlKGL?usp=sharing).
+
 ## Equipe CRIAR - CIn/UFPE 
 - Fernanda Neves
 - Beatriz Oliveira
