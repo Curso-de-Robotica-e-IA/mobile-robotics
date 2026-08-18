@@ -29,3 +29,6 @@ Thumbs.db
 
 # Resultados (muito grandes para Git)
 results/
+
+# Experimentos DWB e RPP
+config/nav2_controllers
