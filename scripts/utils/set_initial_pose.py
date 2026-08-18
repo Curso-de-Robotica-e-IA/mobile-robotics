@@ -12,12 +12,12 @@ Pré-requisitos:
     - Mapa carregado
 
 Mapa:
-    hall_cin_v4.yaml
+    maze.yaml
 
 Posição inicial:
-    x = 1.0216323137283325
-    y = 16.61626625061035
-    z = 0.0
+    x = -0.02106565423309803
+    y = -0.02239053323864937
+    z = 0.350250244140625
     w = 1.0
 """
 
@@ -33,8 +33,9 @@ from geometry_msgs.msg import PoseWithCovarianceStamped
 # POSE INICIAL DO EXPERIMENTO
 # ==================================
 
-START_X = 1.0216323137283325
-START_Y = 16.61626625061035
+START_X = -2.775496244430542
+START_Y = 5.991405963897705
+START_Z = 0.002471923828125 
 
 ORIENTATION_Z = 0.0
 ORIENTATION_W = 1.0
@@ -60,7 +61,7 @@ class InitialPosePublisher(Node):
 
         msg.pose.pose.position.x = START_X
         msg.pose.pose.position.y = START_Y
-        msg.pose.pose.position.z = 0.0
+        msg.pose.pose.position.z = START_Z
 
         msg.pose.pose.orientation.x = 0.0
         msg.pose.pose.orientation.y = 0.0
@@ -77,7 +78,8 @@ class InitialPosePublisher(Node):
         self.get_logger().info(
             f"Pose inicial publicada: "
             f"x={START_X:.2f}, "
-            f"y={START_Y:.2f}"
+            f"y={START_Y:.2f}, "
+            f"z={START_Z:.2f}"
         )
 
 
